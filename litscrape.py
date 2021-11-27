@@ -92,7 +92,7 @@ def fetchpage(url):
         
         for storypart in soup.select('div[class*="panel article"]'):
             data = storypart.find_all('p')
-            story = "\n".join([p1.text for p1 in data])
+            story = "\n\n".join([p1.text for p1 in data])
     except e:
         import traceback
         traceback.print_exc()
