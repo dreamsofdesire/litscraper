@@ -146,7 +146,7 @@ def extractStory(author,url):
         fullstory = fullstory + "\n\nSource:" + page + "\n\n" + story + "\n" 
     
     fullfilename = author +"/" + fname
-    with open(fullfilename, 'w') as f:
+    with open(fullfilename, 'w', encoding="utf-8") as f:
         f.write(fullstory)
         print("Story exported as :", fullfilename)
 
