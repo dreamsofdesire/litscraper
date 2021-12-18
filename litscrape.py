@@ -115,10 +115,9 @@ for page in pages_to_fetch:
 # In[18]:
 
 
-with open(fname, 'w') as f:
+with open(fname, 'w', encoding="utf-8") as f:
     f.write(fullstory)
     print("Story exported as :", fname)
-
 
 # In[ ]:
 
