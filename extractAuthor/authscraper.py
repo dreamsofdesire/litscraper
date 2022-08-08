@@ -30,6 +30,11 @@ else:
 # In[27]:
 
 
+if sys.argv[2]:
+    dest = sys.argv[2] +"/";
+else:
+    dest = os.getcwd()
+print  ("Saving files to "+dest+"\n")
 
 try:
     authpagehtml = requests.get(authurl,headers={"User-Agent" : "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"})
@@ -133,10 +138,14 @@ def extractStory(author,url):
             storyhtml = requests.get(url,headers={"User-Agent" : "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"})
             print('fetching data from: ', url)
             soup = BeautifulSoup(storyhtml.content, "lxml")
+            meta_tag = soup.find('meta', attrs={'name': 'keywords'})
+            # <meta content="Page 4,Harem Sisters Pt. 19,Darth_Aussie,harem,3way,deepthroat,creampie,brother x sister,bondage,group sex" data-rh="true" name="keywords"/>
 
             for storypart in soup.select('div[class*="panel article"]'):
                 data = storypart.find_all('p')
                 story = "\n\n".join([p1.text for p1 in data])
+            story = story + "\n\nTags: "+str(meta_tag)
+
         except e:
             import traceback
             traceback.print_exc()
@@ -145,12 +154,15 @@ def extractStory(author,url):
 
 
     import time
-    fullfilename = author +"/" + fname
+    fullfilename = dest + author +"/" + fname
+    fullfilenamepath = dest + author
 
     # GEL - check to see if the fullfilename already exists and skip if we already have it
     if os.path.exists(fullfilename):
         print (fullfilename+" already exists, skipping \n");
     else:
+        if not os.path.exists(fullfilenamepath):
+            os.makedirs(fullfilenamepath)
         fullstory = fname.split(".txt")[0]
         for page in pages_to_fetch:
             story = fetchpage(page)
