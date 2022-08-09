@@ -34,6 +34,7 @@ if sys.argv[2]:
     dest = sys.argv[2] +"/";
 else:
     dest = os.getcwd()
+
 print  ("Saving files to "+dest+"\n")
 
 try:
@@ -138,13 +139,29 @@ def extractStory(author,url):
             storyhtml = requests.get(url,headers={"User-Agent" : "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"})
             print('fetching data from: ', url)
             soup = BeautifulSoup(storyhtml.content, "lxml")
+
+            # GEL - extract the CSV list of keywords for tagging the stories
+            # I wish there was a way to do this cleaner and there probably is.
+            # get the over all meta html tag
             meta_tag = soup.find('meta', attrs={'name': 'keywords'})
             # <meta content="Page 4,Harem Sisters Pt. 19,Darth_Aussie,harem,3way,deepthroat,creampie,brother x sister,bondage,group sex" data-rh="true" name="keywords"/>
+            tag_html=str(meta_tag)
+            # then split it up first on the quotes
+            tags_html_parts=tag_html.split('"')
+            tags_txt=tags_html_parts[1]
+            # leaving :
+            #Page 4,Harem Sisters Pt. 19,Darth_Aussie,harem,3way,deepthroat,creampie,brother x sister,bondage,group sex
+
+            #then split the rest of that off on the author to get a CSV of the tags
+            tag_words_parts=tags_txt.split(author+",");
+            # Leaving:  harem,3way,deepthroat,creampie,brother x sister,bondage,group sex
 
             for storypart in soup.select('div[class*="panel article"]'):
                 data = storypart.find_all('p')
                 story = "\n\n".join([p1.text for p1 in data])
-            story = story + "\n\nTags: "+str(meta_tag)
+
+            # finally append the tags onto the end of the story for easy searching/indexing
+            story = story + "\n\nTags: "+str(tag_words_parts[1])
 
         except e:
             import traceback
@@ -166,7 +183,7 @@ def extractStory(author,url):
         fullstory = fname.split(".txt")[0]
         for page in pages_to_fetch:
             story = fetchpage(page)
-        #     time.sleep(1)
+            time.sleep(10)
             fullstory = fullstory + "\n\nSource:" + page + "\n\n" + story + "\n"
 
         with open(fullfilename, 'w', encoding="utf-8") as f:
